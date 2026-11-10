@@ -82,6 +82,8 @@ def analytics_consent(item, headers):
 
 
 class LeadTracking:
+    require_supabase = False
+
     def response(self, status, content, mime="application/json", headers=()):
         if mime == "application/json":
             content = json.dumps(content, ensure_ascii=False)
@@ -146,7 +148,8 @@ class LeadTracking:
         except (ValueError, TypeError, AttributeError):
             return self.response(400, {"error": "Dados inválidos."})
 
-        supabase = configured_supabase()
+        supabase = configured_supabase(required=self.require_supabase)
+        download = self.ebook_registration_url(key, supabase) if kind == "ebook_lead" else None
         if supabase:
             saved = supabase.save(key, kind, session, data)
         else:
@@ -157,13 +160,20 @@ class LeadTracking:
                                    (key, kind, session)).fetchone()
         if not saved:
             return self.response(409, {"error": "Não foi possível registrar a solicitação."})
-        self.response(200, {"download": f"/api/ebook?id={key}"} if kind == "ebook_lead" else {"ok": True})
+        self.response(200, {"download": download} if download else {"ok": True})
+
+    def ebook_registration_url(self, key, supabase):
+        return f"/api/ebook?id={key}"
+
+    def respond_ebook(self, supabase):
+        self.response(200, (ROOT / "assets/ebook-santa-clara.pdf").read_bytes(), "application/pdf",
+                      [("Content-Disposition", 'inline; filename="ebook-santa-clara.pdf"')])
 
     def handle_tracking_get(self):
         url = urlsplit(self.path)
         if url.path == "/api/ebook":
             key = parse_qs(url.query).get("id", [""])[0]
-            supabase = configured_supabase()
+            supabase = configured_supabase(required=self.require_supabase)
             if not re.fullmatch(r"[a-f0-9-]{36}", key):
                 found = False
             elif supabase:
@@ -174,8 +184,7 @@ class LeadTracking:
             if not found:
                 self.response(404, {"error": "Preencha o formulário para acessar o e-book."})
             else:
-                self.response(200, (ROOT / "assets/ebook-santa-clara.pdf").read_bytes(), "application/pdf",
-                              [("Content-Disposition", 'inline; filename="ebook-santa-clara.pdf"')])
+                self.respond_ebook(supabase)
             return True
         if url.path not in ("/admin", "/admin/"):
             return False
@@ -203,7 +212,7 @@ class LeadTracking:
             kind = ""
         raw_page = query.get("pagina", ["1"])[0]
         page = max(1, int(raw_page)) if re.fullmatch(r"\d{1,8}", raw_page) else 1
-        supabase = configured_supabase()
+        supabase = configured_supabase(required=self.require_supabase)
         if supabase:
             counts, rows = supabase.dashboard(kind, page, sorted(EVENTS | {"ebook_lead"}), since)
             metrics = supabase_metrics(supabase, since)

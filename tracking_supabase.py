@@ -3,7 +3,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, quote, unquote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 
@@ -15,7 +15,8 @@ class SupabaseTracking:
     def __init__(self, url, key):
         if not re.fullmatch(r"https://[a-z0-9-]+\.supabase\.co/?", url):
             raise TrackingUnavailable("Invalid Supabase URL")
-        self.url = url.rstrip("/") + "/rest/v1/santa_clara_tracking"
+        self.origin = url.rstrip("/")
+        self.url = self.origin + "/rest/v1/santa_clara_tracking"
         self.headers = {"apikey": key, "Content-Type": "application/json"}
         if key.startswith("eyJ"):
             self.headers["Authorization"] = f"Bearer {key}"
@@ -51,6 +52,26 @@ class SupabaseTracking:
         self.request({"on_conflict": "id"}, record=dict(id=key, kind=kind, session=session, data=data))
         return self.exists(key, kind, session)
 
+    def ebook_download_url(self):
+        storage = self.origin + "/storage/v1"
+        object_name = os.environ.get("SANTA_CLARA_EBOOK_STORAGE_OBJECT", "santa-clara-privado/ebook-santa-clara.pdf")
+        parts = object_name.split("/")
+        if len(parts) < 2 or any(part in {"", ".", ".."} for part in parts):
+            raise TrackingUnavailable("Invalid e-book storage path")
+        path = "/object/sign/" + quote(object_name)
+        request = Request(storage + path, b'{"expiresIn":600}', self.headers, method="POST")
+        try:
+            with urlopen(request, timeout=8) as response:
+                url = urlsplit(json.load(response)["signedURL"])
+                tokens = parse_qs(url.query).get("token", [])
+                if url.scheme or url.netloc or unquote(url.path) != f"/object/sign/{object_name}" or len(tokens) != 1:
+                    raise ValueError("Invalid signed URL")
+        except HTTPError as error:
+            raise TrackingUnavailable(f"E-book storage HTTP {error.code}") from None
+        except (URLError, TimeoutError, ValueError, TypeError, KeyError, AttributeError):
+            raise TrackingUnavailable("E-book storage unavailable") from None
+        return f"{storage}{path}?{urlencode({'token': tokens[0]})}"
+
     def dashboard(self, kind, page, kinds, since=""):
         params = {"select": "created,kind,session,data", "order": "created.desc,id.desc",
                   "limit": 100, "offset": (page - 1) * 100}
@@ -74,10 +95,10 @@ class SupabaseTracking:
         return counts, [(row["created"], row["kind"], row["session"], row["data"]) for row in rows]
 
 
-def configured_supabase():
+def configured_supabase(*, required=False):
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_SECRET_KEY")
-    if url or key:
+    if required or url or key:
         if not url or not key:
             raise TrackingUnavailable("Incomplete Supabase configuration")
         return SupabaseTracking(url, key)

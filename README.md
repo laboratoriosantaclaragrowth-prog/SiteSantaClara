@@ -16,6 +16,14 @@ Para usar o Supabase, defina `SUPABASE_URL` e `SUPABASE_SECRET_KEY` no `.env` do
 
 Para testar a entrega do e-book, copie o PDF para `assets/ebook-santa-clara.pdf` no ambiente em que o servidor roda. O arquivo fica fora do Git para preservar a entrega pelo formulário.
 
+## Publicar na Vercel
+
+Importe a raiz do repositório. O `vercel.json` publica as páginas e os assets e liga as rotas de cadastro, métricas e painel à função Python.
+
+Em **Settings → Environment Variables**, defina `SUPABASE_URL` e `SUPABASE_SECRET_KEY` para o ambiente **Production**. Para acessar `/admin/`, defina também `SANTA_CLARA_ADMIN_PASSWORD`. Faça um novo deploy após configurar as variáveis. A função usa o Supabase para salvar os cadastros em produção.
+
+No Supabase, aplique `supabase_tracking.sql` e mantenha `ebook-santa-clara.pdf` no bucket privado `santa-clara-privado`. Para usar outro caminho, defina `SANTA_CLARA_EBOOK_STORAGE_OBJECT` como `bucket/caminho/do-arquivo.pdf` na Vercel. O formulário recebe um link temporário depois que o cadastro é salvo.
+
 ## Verificar o projeto
 
 ```powershell
