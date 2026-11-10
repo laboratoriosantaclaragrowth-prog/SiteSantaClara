@@ -1,0 +1,80 @@
+[
+  {
+    "slug": "hemograma",
+    "name": "Hemograma",
+    "category": "Análises clínicas",
+    "summary": "Avaliação das células do sangue, como glóbulos vermelhos, glóbulos brancos e plaquetas.",
+    "purpose": "O hemograma reúne medidas sobre as células do sangue. Ele pode ajudar o profissional de saúde a investigar alterações como anemia e acompanhar diferentes condições, sempre junto à avaliação clínica.",
+    "collection": "É realizado a partir de uma amostra de sangue coletada para análise em laboratório.",
+    "preparation": "Confirme o preparo para o conjunto de exames do seu pedido. A orientação pode depender de outros exames que serão coletados no mesmo atendimento.",
+    "question": "Hemograma e exame de sangue são a mesma coisa?",
+    "answer": "O hemograma é um dos exames feitos com sangue. Outros exames, como glicemia e colesterol, medem substâncias diferentes e não fazem parte do hemograma.",
+    "source": "https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+    "reviewStatus": "pending"
+  },
+  {
+    "slug": "glicemia",
+    "name": "Glicemia",
+    "category": "Análises clínicas",
+    "summary": "Mede a quantidade de glicose no sangue e auxilia a avaliação do metabolismo do açúcar.",
+    "purpose": "A dosagem de glicemia informa a concentração de glicose no sangue. Pode ser solicitada na investigação e no acompanhamento de alterações da glicose, como o diabetes. O resultado deve ser interpretado pelo profissional que acompanha você.",
+    "collection": "O exame laboratorial utiliza uma amostra de sangue. Existem diferentes formas de avaliar a glicose; confirme qual delas consta no pedido.",
+    "preparation": "Confira com a equipe se o exame solicitado exige jejum e qual orientação deve ser seguida. Não altere medicamentos por conta própria para realizar o exame.",
+    "question": "Toda dosagem de glicemia exige o mesmo preparo?",
+    "answer": "Não. A orientação depende do tipo de exame solicitado. Apresente o pedido à equipe para receber a instrução adequada ao seu atendimento.",
+    "source": "https://medlineplus.gov/lab-tests/blood-glucose-test/",
+    "reviewStatus": "pending"
+  },
+  {
+    "slug": "colesterol",
+    "name": "Colesterol",
+    "category": "Análises clínicas",
+    "summary": "Dosagem de colesterol total e frações, conforme os exames solicitados pelo profissional de saúde.",
+    "purpose": "As dosagens de colesterol ajudam a avaliar as gorduras presentes no sangue. Colesterol total, HDL e LDL são medidas utilizadas, junto com outros fatores, na avaliação da saúde cardiovascular.",
+    "collection": "A análise é feita em uma amostra de sangue. O pedido pode incluir colesterol total, frações e outros exames do perfil lipídico.",
+    "preparation": "Confirme as orientações antes da coleta, considerando todos os exames solicitados. A equipe deve orientar sobre eventual jejum e demais cuidados do atendimento.",
+    "question": "HDL e LDL são o mesmo resultado?",
+    "answer": "Não. HDL e LDL correspondem a diferentes formas de transporte do colesterol. O profissional de saúde avalia essas medidas em conjunto, considerando o seu histórico.",
+    "source": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
+    "reviewStatus": "pending"
+  },
+  {
+    "slug": "exame-de-urina",
+    "name": "Exame de urina",
+    "category": "Análises clínicas",
+    "summary": "Analisa características da urina e auxilia a investigação de alterações do sistema urinário.",
+    "purpose": "O exame de urina avalia características físicas, químicas e microscópicas da amostra. Pode auxiliar a investigação de alterações urinárias e o acompanhamento de diferentes condições de saúde.",
+    "collection": "É necessária uma amostra de urina. O recipiente e o tipo de coleta dependem do exame solicitado; confirme as instruções com o laboratório.",
+    "preparation": "Peça à equipe as orientações sobre recipiente, higiene, coleta e entrega. Não improvise o armazenamento ou o tempo de transporte da amostra.",
+    "question": "Posso levar uma amostra em qualquer recipiente?",
+    "answer": "Utilize o recipiente indicado pela equipe e siga as orientações específicas do exame. Uma coleta inadequada pode comprometer a análise.",
+    "source": "https://medlineplus.gov/ency/article/003579.htm",
+    "reviewStatus": "pending"
+  },
+  {
+    "slug": "exame-de-fezes",
+    "name": "Exame de fezes",
+    "category": "Análises clínicas",
+    "summary": "Inclui a pesquisa de parasitas intestinais, conforme o tipo de análise indicado no pedido.",
+    "purpose": "O parasitológico de fezes pesquisa parasitas e seus ovos em uma amostra de fezes. Existem outros exames realizados com esse material, por isso é importante confirmar o nome da análise solicitada.",
+    "collection": "A análise depende de uma amostra de fezes coletada em recipiente apropriado. O número de amostras pode variar conforme a solicitação.",
+    "preparation": "Solicite as instruções sobre recipiente, quantidade de amostras, conservação e entrega antes de iniciar a coleta. Siga a orientação fornecida para o seu pedido.",
+    "question": "Todos os exames de fezes investigam a mesma coisa?",
+    "answer": "Não. A pesquisa de parasitas é uma das análises possíveis. O pedido do profissional de saúde define o exame e as orientações de coleta necessárias.",
+    "source": "https://medlineplus.gov/lab-tests/ova-and-parasite-test/",
+    "reviewStatus": "pending"
+  },
+  {
+    "slug": "eletrocardiograma",
+    "name": "Eletrocardiograma",
+    "category": "Cardiologia",
+    "summary": "Também chamado de ECG, registra a atividade elétrica do coração durante o exame.",
+    "purpose": "O eletrocardiograma registra os sinais elétricos produzidos pelo coração. O traçado ajuda o profissional de saúde a avaliar a frequência e o ritmo dos batimentos.",
+    "collection": "O ECG utiliza eletrodos colocados sobre a pele para registrar os sinais cardíacos. Diferentemente de uma análise de sangue, não exige coleta de amostra biológica.",
+    "preparation": "Confirme a disponibilidade e as orientações para realizar o ECG antes de ir ao laboratório. Informe à equipe quais medicamentos utiliza, sem suspendê-los por conta própria.",
+    "question": "Eletrocardiograma é um exame de sangue?",
+    "answer": "Não. É um registro da atividade elétrica do coração feito com eletrodos sobre a pele. O resultado deve ser avaliado pelo profissional de saúde.",
+    "source": "https://medlineplus.gov/lab-tests/electrocardiogram/",
+    "reviewStatus": "pending"
+  }
+]

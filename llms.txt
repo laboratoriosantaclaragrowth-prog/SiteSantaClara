@@ -1,0 +1,14 @@
+# Laboratório Santa Clara
+
+> Laboratório de análises clínicas em Araçuaí, Minas Gerais. O site reúne informações sobre exames, preparo, atendimento e coleta domiciliar.
+
+## Páginas principais
+
+- [Página inicial](https://laboratoriosantaclaramg.com.br/): Informações sobre o laboratório e seus serviços em Araçuaí.
+- [Guia de exames](https://laboratoriosantaclaramg.com.br/exames/): Exames com páginas informativas e orientações de atendimento.
+- [Onde fazer exames em Araçuaí](https://laboratoriosantaclaramg.com.br/exames/aracuai/): Como consultar disponibilidade e planejar a visita.
+- [Coleta domiciliar](https://laboratoriosantaclaramg.com.br/santa-clara-ate-voce/): Como consultar cobertura e disponibilidade para seu endereço.
+- [Contato e localização](https://laboratoriosantaclaramg.com.br/contato/): Canais oficiais de atendimento e informações da unidade.
+- [Blog de exames](https://laboratoriosantaclaramg.com.br/blog/): Orientações sobre preparo, coleta, convênios e resultados.
+
+Confirme exames, preparo, horários e cobertura da coleta domiciliar pelos canais de atendimento do laboratório.

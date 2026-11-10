@@ -1,0 +1,105 @@
+.sc-analytics-preferences[hidden],
+.sc-analytics-status[hidden] {
+  display: none;
+}
+
+.sc-analytics-controls {
+  padding: .65rem 1rem 1rem;
+  text-align: center;
+}
+
+.sc-analytics-controls button {
+  padding: .45rem .65rem;
+  background: #fff;
+  border: 1px solid #c8dce8;
+  border-radius: .35rem;
+  color: #084766;
+  font: inherit;
+  font-size: .875rem;
+  cursor: pointer;
+}
+
+.sc-analytics-preferences {
+  position: fixed;
+  z-index: 900;
+  inset-inline-start: max(1rem, env(safe-area-inset-left));
+  inset-block-end: max(1rem, env(safe-area-inset-bottom));
+  width: min(32rem, calc(100% - 2rem));
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  background: #fff;
+  border: 1px solid #c8dce8;
+  border-radius: .85rem;
+  box-shadow: 0 .6rem 2rem #10354d33;
+  color: #163649;
+  font: inherit;
+  font-size: .9375rem;
+  line-height: 1.5;
+}
+
+.sc-analytics-preferences h2 {
+  margin: 0;
+  color: #084766;
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sc-analytics-preferences p {
+  margin: .45rem 0;
+  color: inherit;
+}
+
+.sc-analytics-status {
+  font-weight: 600;
+}
+
+.sc-analytics-preferences a {
+  color: #084766;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.sc-analytics-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .65rem;
+  margin-top: 1rem;
+}
+
+.sc-analytics-options button {
+  min-height: 44px;
+  padding: .5rem .6rem;
+  border: 1px solid #0d526e;
+  border-radius: .45rem;
+  background: #fff;
+  color: #084766;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sc-analytics-options button:disabled {
+  color: #536a76;
+  background: #edf2f5;
+  cursor: not-allowed;
+}
+
+.sc-analytics-options button:hover:not(:disabled),
+.sc-analytics-controls button:hover {
+  background: #edf7fc;
+}
+
+.sc-analytics-preferences :focus-visible,
+.sc-analytics-controls :focus-visible {
+  outline: 2px solid #084766;
+  outline-offset: 2px;
+}
+
+@media (max-width: 23rem) {
+  .sc-analytics-options {
+    grid-template-columns: 1fr;
+  }
+}

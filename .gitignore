@@ -1,0 +1,53 @@
+# Logs
+*.log
+preview.log
+server.log
+preview-error.log
+server-error.log
+
+# Caches & temporary files
+__pycache__/
+*.pyc
+api-cache/
+page-cache/
+.DS_Store
+Thumbs.db
+
+# Backups
+backups/
+/.santa-clara-private/
+/.env
+/.env.*
+!/.env.example
+
+# PDF entregue pelo servidor após o cadastro
+/ebook.pdf
+/assets/ebook-santa-clara.pdf
+
+# Capturas, referências e cópias de trabalho locais
+/verification/
+/tools/vendor/
+/_nuxt/
+/uploads/
+/asset-manifest.json
+/original.html
+/serve.py
+/script.js
+/styles.css
+/tools/mirror.py
+/tools/prepare.py
+/tools/build_ate_voce.py
+/tools/build_santa_clara.py
+/reference-ate-voce.html
+/lustosa-reference.html
+/reference-parts.json
+/imagem_rodap*-ate-voce*
+/assets/ebook-popup-preview-local.html
+/LOGO AMAYNARA*.pdf
+/certificado PNCQ (1).pdf
+/icone do whatsapp.png
+/image_hero*.png
+/imagem_hero*.png
+/imagempopup.png
+/lab-banner.png
+/planetinha_santaclara.png

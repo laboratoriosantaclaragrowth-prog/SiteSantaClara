@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /assets/ebook-popup-preview-local.html
+
+# Rastreamento de páginas públicas para respostas do ChatGPT Search.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /assets/ebook-popup-preview-local.html
+
+Sitemap: https://laboratoriosantaclaramg.com.br/sitemap.xml

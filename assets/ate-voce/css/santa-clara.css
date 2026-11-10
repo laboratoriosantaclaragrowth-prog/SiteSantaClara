@@ -1,0 +1,123 @@
+@import url("/assets/whatsapp-buttons.css");
+
+@font-face{font-family:dasaFont;src:url(/assets/8e88e9d9c3767319.woff2) format("woff2");font-display:swap;font-weight:300;font-style:normal}
+@font-face{font-family:dasaFont;src:url(/assets/4c45f7ce5fde02c9.woff2) format("woff2");font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:dasaFont;src:url(/assets/e4f4a119cbda6948.woff2) format("woff2");font-display:swap;font-weight:500;font-style:normal}
+@font-face{font-family:dasaFont;src:url(/assets/ba29f941f612b9de.woff2) format("woff2");font-display:swap;font-weight:600;font-style:normal}
+@font-face{font-family:dasaFont;src:url(/assets/c5798eb1b63ffce6.woff2) format("woff2");font-display:swap;font-weight:700;font-style:normal}
+@font-face{font-family:dasaFont Fallback;src:local("Arial");ascent-override:93.00%;descent-override:24.45%;line-gap-override:0.00%;size-adjust:99.78%}
+html {
+  --font-site: "dasaFont", "dasaFont Fallback", Arial, sans-serif;
+}
+body,
+#highlights .bx-status span,
+#vantagens .carrossel-vantagens .item p {
+  font-family: var(--font-site);
+}
+button, input, optgroup, select, textarea {
+  font-family: inherit;
+}
+/* Keep headings regular across components with their own weight rules. */
+:is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-site);
+  font-weight: 400 !important;
+}
+body{--vermelho-pardini:#0057c8;--azul:#183453;--rosa:#09a3d4;--rosa-claro:#e9f5fc}
+*{letter-spacing:0!important}
+html{scroll-behavior:smooth}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid #0057c8;outline-offset:5px}
+.sc-brand{display:inline-flex;align-items:center;gap:8px;color:#07399b;text-decoration:none;flex-shrink:0}
+.sc-brand img{width:46px;height:46px;object-fit:contain}
+.sc-brand span{font-size:11px;line-height:16px;white-space:nowrap}
+.sc-brand strong{display:block;font-size:18px;line-height:21px}
+.sc-skip{position:absolute;left:16px;top:-60px;background:#fff;color:#0057c8;padding:12px;z-index:100}
+.sc-skip:focus{top:10px}
+header .navbar-toggler{min-height:44px;min-width:44px}
+@media (min-width: 992px) {
+  header { height: 64px; }
+  header .header-container { max-width: 1142px; padding-inline: 24px; }
+  header .navbar { padding-block: 0; }
+  header .menu-header { display: none; }
+  header .navbar-nav { align-items: center; gap: clamp(12px, 1.6vw, 24px); }
+  header .nav-item .nav-link { color: #07399b !important; font-weight: 500; padding: 8px 0 !important; line-height: 1.25; white-space: nowrap; }
+  header .navbar-nav .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    margin: 0;
+    min-height: 44px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border-color: #0057c8;
+    background: #0057c8;
+    color: #fff;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  header .navbar-nav .btn-secondary::before { background-color: #fff; }
+}
+#banner .banner-img{object-fit:contain;object-position:left center}
+#banner .topic img{filter:hue-rotate(210deg)}
+#services .list-cards{padding:28px 20px}
+#services .list-cards:focus .verso{display:flex;align-items:center}
+#services .list-cards:focus .verso p{color:#fff;font-size:14px;line-height:1.4;margin:0}
+#services .list-cards svg [fill]:not([fill="none"]){fill:var(--vermelho-pardini)}
+#region{background-image:linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.92) 18%, rgba(255,255,255,0.4) 38%, rgba(255,255,255,0) 60%), url('../images/region-background-mg2.png')}
+#region .unidades{height:auto;min-height:220px}
+#region .content{width:auto;margin-top:24px}
+#region .content p{margin-bottom:6px;line-height:1.5}
+.route-link{color:#0057c8;text-decoration:underline;margin-top:12px}
+#facilidades .icon{border-color:#0057c8!important}
+#facilidades .icon svg path{fill:#0057c8!important}
+#facilidades .bx-facilidades svg circle{stroke:#0057c8!important}
+#facilidades .bx-facilidades svg [fill="#D0043C"],#facilidades .bx-facilidades svg [fill="#F37491"]{fill:#0057c8!important}
+#facilidades .bx-facilidades::before{border-top-color:#0057c8!important}
+#facilidades .end-dot{background:#0057c8!important}
+#vantagens .carrossel-vantagens{width:100%;max-width:592px;padding-right:55px}
+#vantagens .carrossel-vantagens .item{width:100%!important;min-height:200px;height:auto;border:1px solid #9aa49c;display:flow-root;padding:26px 28px;border-radius:20px}
+#vantagens .carrossel-vantagens .item h4{margin-top:10px;line-height:1.3}
+#vantagens .carrossel-vantagens .item p{line-height:1.5;color:#545454}
+#vantagens .carrossel-vantagens .item .icon{height:145px}
+.benefit-controls{position:absolute;right:0;top:45px;display:grid;gap:10px}
+.benefit-controls button{width:42px;height:42px;background:#0057c8;color:#fff;border:0;border-radius:5px;font-size:24px}
+.benefit-status{font-size:12px;color:#545454;margin:10px 0}
+#perguntas-frequentes{height:auto;min-height:564px;background-image:url('../images/faq-background.png')}
+#perguntas-frequentes .accordion-body{line-height:1.6}
+#perguntas-frequentes .accordion-button{line-height:1.5;min-height:60px}
+footer .sc-brand{color:#fff}
+footer .sc-brand span{color:#fff}
+footer .itens svg{width:22px;height:22px}
+footer .itens a{min-width:32px;min-height:32px}
+dialog{width:min(560px,calc(100% - 32px));max-height:85dvh;border:0;border-radius:8px;padding:32px;color:#183453}
+dialog::backdrop{background:#18345388}
+dialog h2{font-size:24px;padding-right:20px}
+dialog p{font-size:16px;line-height:1.6}
+[data-close-privacy]{position:absolute;right:8px;top:8px;width:40px;height:40px;background:none;border:0;color:#0057c8;font-size:28px}
+@media(min-width:1201px){#banner .banner-img{width:720px;right:max(0px,calc((100vw - 1440px)/2));height:500px;top:135px}}
+@media(max-width:991px){
+ header .menu-icon,header .close-icon{background-image:none!important;position:relative}
+ header .menu-icon:after{content:'☰';font-size:27px;color:#0057c8;line-height:30px}
+ header .close-icon:after{content:'×';font-size:36px;color:white;line-height:30px}
+ header .menu-logo{font-weight:700;color:#fff;font-size:20px}
+ #navbarNav{max-height:100dvh;overflow:auto;z-index:10}
+ #navbarNav.show{display:block}
+}
+@media(max-width:767px){
+ header .header-container{padding:0 20px}
+ .sc-brand img{width:48px;height:48px}
+ .sc-brand strong{font-size:17px}
+ #banner .banner-img{width:min(100%,560px);height:auto;aspect-ratio:1.53;object-fit:contain}
+ #banner .text-description,#banner h1{max-width:100%}
+ #banner p{margin-inline:0}
+ #banner .topic-list{flex-wrap:wrap}
+ #region{height:auto;min-height:580px}
+ #region .unidades{width:calc(100% - 40px);max-width:518px;padding:30px 24px}
+ #region h3{padding-inline:20px;line-height:1.3}
+ #vantagens .carrossel-vantagens .item{min-height:240px;padding:20px}
+ #vantagens .carrossel-vantagens .item .icon{position:static;float:none;height:44px;margin-bottom:16px;align-items:flex-start}
+ #vantagens .carrossel-vantagens .item h4,#vantagens .carrossel-vantagens .item p{float:none;width:100%;padding:0;text-align:left}
+ #facilidades h3{padding-inline:16px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}

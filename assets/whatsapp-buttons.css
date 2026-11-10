@@ -1,0 +1,21 @@
+:is(.site-button, .guide-link, .btn)[href^="https://wa.me/"]::before,
+.site-button[data-action="agendar"]::before {
+  content: "";
+  flex: none;
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  background-color: #fff;
+  mask: url("/assets/whatsapp-icon.png") center / contain no-repeat;
+}
+
+.btn[href^="https://wa.me/"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+}
+
+:is(.site-button.outline, .guide-link, .btn-secondary, .contact-band .site-button)[href^="https://wa.me/"]::before,
+.btn-primary[href^="https://wa.me/"]:is(:hover, :focus)::before {
+  background-color: #0057c8;
+}
