@@ -72,6 +72,17 @@ class SupabaseTracking:
             raise TrackingUnavailable("E-book storage unavailable") from None
         return f"{storage}{path}?{urlencode({'token': tokens[0]})}"
 
+    def ebook_pdf(self):
+        limit = 4_500_000
+        try:
+            with urlopen(self.ebook_download_url(), timeout=8) as response:
+                pdf = response.read(limit + 1)
+        except (URLError, TimeoutError):
+            raise TrackingUnavailable("E-book download unavailable") from None
+        if len(pdf) > limit or not pdf.startswith(b"%PDF-"):
+            raise TrackingUnavailable("Invalid e-book PDF or Vercel response limit exceeded")
+        return pdf
+
     def dashboard(self, kind, page, kinds, since=""):
         params = {"select": "created,kind,session,data", "order": "created.desc,id.desc",
                   "limit": 100, "offset": (page - 1) * 100}
