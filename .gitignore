@@ -12,6 +12,8 @@ api-cache/
 page-cache/
 .DS_Store
 Thumbs.db
+/.vercel/
+/.vercel-static/
 
 # Backups
 backups/

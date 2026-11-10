@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "node tools/build_vercel.mjs",
+  "outputDirectory": ".vercel-static",
+  "rewrites": [
+    {
+      "source": "/api/:action(ebook-leads|ebook|events)",
+      "destination": "/api/tracking?sc_action=:action"
+    },
+    {
+      "source": "/admin",
+      "destination": "/api/tracking?sc_action=admin"
+    },
+    {
+      "source": "/admin/",
+      "destination": "/api/tracking?sc_action=admin"
+    }
+  ]
+}
