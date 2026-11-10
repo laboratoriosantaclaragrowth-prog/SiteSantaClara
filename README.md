@@ -22,7 +22,7 @@ Importe a raiz do repositório. O `vercel.json` publica as páginas e os assets 
 
 Em **Settings → Environment Variables**, defina `SUPABASE_URL` e `SUPABASE_SECRET_KEY` para o ambiente **Production**. Para acessar `/admin/`, defina também `SANTA_CLARA_ADMIN_PASSWORD`. Faça um novo deploy após configurar as variáveis. A função usa o Supabase para salvar os cadastros em produção.
 
-No Supabase, aplique `supabase_tracking.sql` e mantenha `ebook-santa-clara.pdf` no bucket privado `santa-clara-privado`. Para usar outro caminho, defina `SANTA_CLARA_EBOOK_STORAGE_OBJECT` como `bucket/caminho/do-arquivo.pdf` na Vercel. O formulário recebe um link temporário depois que o cadastro é salvo.
+No Supabase, aplique `supabase_tracking.sql` e mantenha `ebook-santa-clara.pdf` no bucket privado `santa-clara-privado`. Para usar outro caminho, defina `SANTA_CLARA_EBOOK_STORAGE_OBJECT` como `bucket/caminho/do-arquivo.pdf` na Vercel. Após salvar o cadastro, o formulário abre o PDF pelo endereço `/ebook` do próprio site. O PDF precisa ter até 4,5 MB para ser entregue pela função da Vercel.
 
 ## Verificar o projeto
 

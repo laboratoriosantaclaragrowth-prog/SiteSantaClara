@@ -48,7 +48,7 @@ class VercelTrackingTests(unittest.TestCase):
         status, headers, body = self.request("POST", path, self.data)
         self.assertEqual(status, 200)
         self.assertEqual(headers["Cache-Control"], "no-store")
-        self.assertEqual(json.loads(body)["download"], db.ebook_download_url.return_value)
+        self.assertEqual(json.loads(body)["download"], f"/ebook?id={self.data['id']}")
         configured.assert_called_with(required=True)
         self.assertEqual(db.save.call_args.args[:3], (self.data["id"], "ebook_lead", self.data["session"]))
 
@@ -56,13 +56,15 @@ class VercelTrackingTests(unittest.TestCase):
     def test_download_requires_a_registered_id(self, configured):
         db = configured.return_value
         db.exists.side_effect = [False, True]
-        db.ebook_download_url.return_value = "https://example.test/signed.pdf"
-        path = f"/api/tracking?sc_action=ebook&id={self.data['id']}"
+        db.ebook_pdf.return_value = b"%PDF-1.7\n"
+        path = f"/ebook?id={self.data['id']}"
         self.assertEqual(self.request("GET", path)[0], 404)
-        db.ebook_download_url.assert_not_called()
-        status, headers, _ = self.request("GET", path)
-        self.assertEqual(status, 302)
-        self.assertEqual(headers["Location"], db.ebook_download_url.return_value)
+        db.ebook_pdf.assert_not_called()
+        status, headers, body = self.request("GET", f"/api/tracking?sc_action=ebook&id={self.data['id']}")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "application/pdf")
+        self.assertNotIn("Location", headers)
+        self.assertEqual(body, db.ebook_pdf.return_value)
 
     @patch("lead_tracking.configured_supabase", side_effect=TrackingUnavailable)
     def test_bad_requests_and_missing_configuration_return_json(self, configured):

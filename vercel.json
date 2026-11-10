@@ -5,6 +5,10 @@
   "outputDirectory": ".vercel-static",
   "rewrites": [
     {
+      "source": "/ebook",
+      "destination": "/api/tracking?sc_action=ebook"
+    },
+    {
       "source": "/api/:action(ebook-leads|ebook|events)",
       "destination": "/api/tracking?sc_action=:action"
     },

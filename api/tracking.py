@@ -19,6 +19,8 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
     def tracking_path(self):
         url = urlsplit(self.path)
         path = url.path.rstrip("/")
+        if path == "/ebook":
+            path = PATHS["ebook"]
         if path == "/api/tracking":
             actions = parse_qs(url.query).get("sc_action", [])
             path = PATHS.get(actions[0], "") if len(actions) == 1 else ""
@@ -46,11 +48,12 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
             self.response(503, {"error": "Não foi possível concluir agora. Tente novamente."})
 
     def ebook_registration_url(self, key, supabase):
-        return supabase.ebook_download_url()
+        supabase.ebook_download_url()
+        return f"/ebook?id={key}"
 
     def respond_ebook(self, supabase):
-        self.response(302, "", "text/plain; charset=utf-8",
-                      [("Location", supabase.ebook_download_url())])
+        self.response(200, supabase.ebook_pdf(), "application/pdf",
+                      [("Content-Disposition", 'inline; filename="ebook-santa-clara.pdf"')])
 
     def end_headers(self):
         self.send_header("X-Robots-Tag", "noindex, nofollow")
