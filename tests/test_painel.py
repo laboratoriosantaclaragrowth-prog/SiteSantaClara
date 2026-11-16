@@ -69,6 +69,15 @@ class PainelTests(unittest.TestCase):
         self.assertIn("HttpOnly", headers["Set-Cookie"])
         self.assertFalse(admin_painel.verify_token(token + "0"))
 
+    def test_login_accepts_null_origin_only_from_same_site(self):
+        form = {"Content-Type": "application/x-www-form-urlencoded", "Origin": "null"}
+        status, headers, _ = self.request("POST", "/api/tracking?sc_action=admin-login", "password=senha-de-teste",
+                                          {**form, "Sec-Fetch-Site": "same-origin"})
+        self.assertEqual((status, headers["Location"]), (303, "/admin"))
+        status, _, _ = self.request("POST", "/api/tracking?sc_action=admin-login", "password=senha-de-teste",
+                                    {**form, "Sec-Fetch-Site": "cross-site"})
+        self.assertEqual(status, 403)
+
     def test_leads_csv_requires_login(self):
         status, headers, _ = self.request("GET", "/api/tracking?sc_action=admin-leads")
         self.assertEqual(status, 303)

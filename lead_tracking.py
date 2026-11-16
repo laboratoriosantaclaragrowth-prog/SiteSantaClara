@@ -277,6 +277,10 @@ class LeadTracking:
     def same_origin(self):
         origin = self.headers.get("Origin")
         host = self.headers.get("Host")
+        if origin == "null":
+            # Com "Referrer-Policy: no-referrer" o Chrome manda Origin "null" no formulário.
+            # Sec-Fetch-Site é preenchido pelo próprio navegador e não pode ser forjado por outra página.
+            return self.headers.get("Sec-Fetch-Site") == "same-origin"
         return not origin or origin in (f"http://{host}", f"https://{host}")
 
     def handle_track_post(self):
