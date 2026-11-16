@@ -1,17 +1,17 @@
-import base64
+import time
 import hmac
 import json
 import os
 import re
 import sqlite3
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlsplit
-from tracking_supabase import configured_supabase
-from tracking_metrics import PERIODS, period_start, summarize, supabase_metrics
-from admin_dashboard import render_dashboard_html
+from tracking_supabase import TrackingUnavailable, configured_supabase
+import admin_painel
 
 ROOT = Path(__file__).resolve().parent
 PRIVATE = ROOT / ".santa-clara-private"
@@ -66,6 +66,66 @@ def trusted_location(headers):
             for field, header in (("city", "City"), ("neighborhood", "Neighborhood"))}
 
 
+def visitor_location(headers):
+    """Cidade da visita. Na Vercel os cabeçalhos x-vercel-ip-* são preenchidos pela própria Vercel."""
+    location = {}
+    if os.environ.get("VERCEL") == "1":
+        for field, header, size in (("city", "X-Vercel-IP-City", 80), ("region", "X-Vercel-IP-Country-Region", 80),
+                                    ("country", "X-Vercel-IP-Country", 60)):
+            value = clipped(unquote(headers.get(header, "")), size)
+            if value:
+                location[field] = value
+    proxy = trusted_location(headers)
+    if proxy.get("city"):
+        location["city"] = proxy["city"]
+    return location
+
+
+BOT = re.compile(r"bot|crawl|spider|slurp|preview|lighthouse|headless|facebookexternalhit|whatsapp|bingpreview|pingdom|uptime", re.I)
+TRACK_EVENTS = {"pageview", "page_time", "section_view", "section_time", "click", "ebook_open", "ebook_close", "ebook_submit"}
+TRACK_TARGETS = {"whatsapp", "phone", "maps", "email", "internal", "external", "button", "download"}
+SESSION_FIELDS = {
+    "landing_page": 300, "page": 300, "referrer": 500, "referrer_host": 200, "utm_source": 120, "utm_medium": 120,
+    "utm_campaign": 200, "utm_term": 200, "utm_content": 200, "gclid": 200, "device": 20, "os": 40, "browser": 40,
+    "screen": 20, "language": 20, "timezone": 60,
+}
+
+
+def clean_track_batch(item):
+    """Valida o lote do rastreador do site. Retorna None se estiver malformado."""
+    session = item.get("session")
+    events = item.get("events", [])
+    if not isinstance(session, dict) or not isinstance(events, list):
+        return None
+    try:
+        clean = {"id": str(uuid.UUID(clipped(session.get("id"), 40))),
+                 "visitor_id": str(uuid.UUID(clipped(session.get("visitor_id"), 40)))}
+    except ValueError:
+        return None
+    # Campos vazios ficam de fora (viram nulo no banco), senão "gclid vazio" contaria como anúncio.
+    clean.update({key: value for key, size in SESSION_FIELDS.items() if (value := clipped(session.get(key), size))})
+    for key in ("landing_page", "page"):
+        clean[key] = path_only(clean.get(key, "")) or "/"
+    for key, top in (("active_seconds", 14400), ("max_scroll", 100)):
+        value = session.get(key)
+        valid = isinstance(value, (int, float)) and not isinstance(value, bool)
+        clean[key] = min(max(int(value), 0), top) if valid else 0
+    clean["is_returning"] = session.get("is_returning") is True
+    cleaned_events = []
+    for event in events[:200]:
+        if not isinstance(event, dict) or event.get("type") not in TRACK_EVENTS:
+            continue
+        value = event.get("value")
+        cleaned_events.append({
+            "type": event["type"], "page": path_only(clipped(event.get("page"), 300)) or "/",
+            "section": clipped(event.get("section"), 60), "label": clipped(event.get("label"), 120),
+            "target": event.get("target") if event.get("target") in TRACK_TARGETS else "",
+            "href": clipped(event.get("href"), 300), "ts": clipped(event.get("ts"), 40),
+            "value": value if isinstance(value, (int, float)) and not isinstance(value, bool) else None,
+        })
+    return {"first": item.get("first") is True, "session": clean, "events": cleaned_events}
+
+
 def analytics_consent(item, headers):
     if item.get("analyticsConsent") != "v1" or headers.get("Sec-GPC") == "1" or headers.get("DNT") == "1":
         return None
@@ -99,6 +159,10 @@ class LeadTracking:
 
     def handle_tracking_post(self):
         path = urlsplit(self.path).path
+        if path in ("/admin/login", "/admin/logout"):
+            return self.handle_admin_post(path)
+        if path == "/api/track":
+            return self.handle_track_post()
         if path not in ("/api/events", "/api/ebook-leads"):
             return self.send_error(404)
         origin = self.headers.get("Origin")
@@ -132,7 +196,16 @@ class LeadTracking:
                 if phone and (not re.fullmatch(r"[+\d ()-]+", phone) or not 10 <= len(re.sub(r"\D", "", phone)) <= 15):
                     return self.response(400, {"error": "Confira o número de WhatsApp informado."})
                 data.update(name=name, email=email, phone=phone, marketing=item.get("marketing") is True,
-                            consent_version="ebook-v1")
+                            consent_version="ebook-v1",
+                            is_test=admin_painel.is_test_visit(self.headers.get("Host"), self.headers.get("Cookie")))
+                if consent_at:
+                    # Liga o cadastro à visita no painel (só com a análise autorizada).
+                    for field, source in (("visitor_id", "visitorId"), ("track_session", "trackSession")):
+                        try:
+                            data[field] = str(uuid.UUID(clipped(item.get(source), 40)))
+                        except ValueError:
+                            pass
+                    data.update(device=device_type(self.headers), **visitor_location(self.headers))
             else:
                 kind = clipped(item.get("event"), 40)
                 if kind not in EVENTS:
@@ -186,54 +259,137 @@ class LeadTracking:
             else:
                 self.respond_ebook(supabase)
             return True
-        if url.path not in ("/admin", "/admin/"):
-            return False
-        password = os.environ.get("SANTA_CLARA_ADMIN_PASSWORD")
-        if not password:
-            self.response(503, "Configure a senha do painel no servidor.", "text/plain; charset=utf-8")
+        if url.path in ("/admin", "/admin/", "/admin/leads.csv"):
+            self.handle_admin_get(url)
             return True
-        token = base64.b64encode(f"admin:{password}".encode()).decode()
-        supplied = self.headers.get("Authorization", "")
-        if not hmac.compare_digest(supplied.encode(), f"Basic {token}".encode()):
-            self.response(401, "Acesso restrito", "text/plain; charset=utf-8",
-                          [("WWW-Authenticate", 'Basic realm="Santa Clara"')])
-            return True
-        self.render_dashboard(url)
-        return True
+        return False
 
-    def render_dashboard(self, url):
-        query = parse_qs(url.query)
-        period = query.get("periodo", ["7d"])[0]
-        if period not in PERIODS:
-            period = "7d"
-        since = period_start(period)
-        kind = query.get("tipo", [""])[0]
-        if kind not in EVENTS | {"ebook_lead"}:
-            kind = ""
-        raw_page = query.get("pagina", ["1"])[0]
-        page = max(1, int(raw_page)) if re.fullmatch(r"\d{1,8}", raw_page) else 1
+    # ------------------------------------------------------------ painel do site
+
+    def send_empty(self, status=204, headers=()):
+        self.send_response(status)
+        self.send_header("Content-Length", "0")
+        self.send_header("Cache-Control", "no-store")
+        for key, value in headers:
+            self.send_header(key, value)
+        self.end_headers()
+
+    def same_origin(self):
+        origin = self.headers.get("Origin")
+        host = self.headers.get("Host")
+        return not origin or origin in (f"http://{host}", f"https://{host}")
+
+    def handle_track_post(self):
+        if not self.same_origin():
+            return self.send_empty(403)
+        if BOT.search(self.headers.get("User-Agent") or "bot"):
+            return self.send_empty()
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            if not 0 < length <= 64000:
+                raise ValueError
+            item = json.loads(self.rfile.read(length))
+            if not isinstance(item, dict):
+                raise ValueError
+        except (ValueError, TypeError):
+            return self.send_empty(400)
+        if not analytics_consent(item, self.headers):
+            return self.send_empty(403)
+        batch = clean_track_batch(item)
+        if batch is None:
+            return self.send_empty(400)
+        host = self.headers.get("Host")
+        batch["session"]["hostname"] = admin_painel.host_name(host)
+        batch["session"]["is_test"] = admin_painel.is_test_visit(host, self.headers.get("Cookie"))
+        if batch["first"]:
+            batch["session"].update(visitor_location(self.headers))
         supabase = configured_supabase(required=self.require_supabase)
         if supabase:
-            counts, rows = supabase.dashboard(kind, page, sorted(EVENTS | {"ebook_lead"}), since)
-            metrics = supabase_metrics(supabase, since)
-        else:
-            with closing(database()) as db:
-                counts = dict(db.execute("SELECT kind, COUNT(*) FROM records WHERE created >= ? GROUP BY kind",
-                                         (since,)))
-                counts["whatsapp_click"] = db.execute("""SELECT COUNT(*) FROM records
-                    WHERE created >= ? AND kind = 'link_click' AND (
-                        json_extract(data, '$.target') LIKE 'https://wa.me/%'
-                        OR json_extract(data, '$.target') LIKE 'https://api.whatsapp.com/%'
-                        OR json_extract(data, '$.target') LIKE 'https://web.whatsapp.com/%'
-                    )""", (since,)).fetchone()[0]
-                rows = db.execute("""SELECT created, kind, session, data FROM records
-                    WHERE created >= ? AND (?='' OR kind=?) ORDER BY created DESC, rowid DESC LIMIT 100 OFFSET ?""",
-                                  (since, kind, kind, (page - 1) * 100)).fetchall()
-                metrics = summarize(db.execute("""SELECT created, session, data FROM records
-                    WHERE kind='page_view' AND created >= ?""", (since,)))
-        labels = {"ebook_lead": "Cadastros", "page_view": "Páginas vistas", "link_click": "Cliques em links",
-                  "ebook_popup_view": "Pop-ups vistos", "ebook_popup_click": "Envios iniciados",
-                  "ebook_popup_close": "Pop-ups fechados"}
-        markup = render_dashboard_html(counts=counts, rows=rows, kind=kind, page=page,
-                                       labels=labels, metrics=metrics, period=period)
-        self.response(200, markup, "text/html; charset=utf-8")
+            try:
+                supabase.rpc("sc_track_batch", {"p": batch})
+            except TrackingUnavailable as error:
+                self.log_error("track: %s", error)
+        self.send_empty()
+
+    def handle_admin_post(self, path):
+        if not self.same_origin():
+            return self.send_empty(403)
+        if path == "/admin/logout":
+            return self.send_empty(303, [("Location", "/admin"),
+                                         ("Set-Cookie", admin_painel.session_cookie(self.headers.get("Host")))])
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            form = parse_qs(self.rfile.read(length).decode("utf-8")) if 0 < length <= 2048 else {}
+        except (ValueError, UnicodeDecodeError):
+            form = {}
+        time.sleep(0.4)  # dificulta tentativa e erro
+        if not admin_painel.check_password(form.get("password", [""])[0]):
+            return self.send_empty(303, [("Location", "/admin?erro=1")])
+        cookie = admin_painel.session_cookie(self.headers.get("Host"), admin_painel.create_token())
+        self.send_empty(303, [("Location", "/admin"), ("Set-Cookie", cookie)])
+
+    def handle_admin_get(self, url):
+        query = parse_qs(url.query)
+        html = "text/html; charset=utf-8"
+        private = [("X-Frame-Options", "DENY")]
+        if not admin_painel.verify_token(admin_painel.cookie_token(self.headers.get("Cookie"))):
+            if url.path == "/admin/leads.csv":
+                return self.send_empty(303, [("Location", "/admin")])
+            return self.response(200, admin_painel.render_login(error="erro" in query), html, private)
+        supabase = configured_supabase()
+        if not supabase:
+            return self.response(503, admin_painel.render_message(
+                "Falta conectar o Supabase",
+                "Preencha <code>SUPABASE_URL</code> e <code>SUPABASE_SECRET_KEY</code> no servidor."), html, private)
+        include_test = query.get("t", [""])[0] == "1"
+        if url.path == "/admin/leads.csv":
+            params = [("select", "created_at,name,email,phone,page,utm_source,utm_medium,utm_campaign,device,city,region"),
+                      ("order", "created_at.desc"), ("limit", "10000")]
+            if not include_test:
+                params.append(("is_test", "eq.false"))
+            try:
+                rows = supabase.call("sc_leads", params)
+            except TrackingUnavailable as error:
+                self.log_error("leads: %s", error)
+                return self.response(503, admin_painel.render_message("Erro ao baixar", "Tente novamente em instantes."),
+                                     html, private)
+            disposition = "attachment; filename*=UTF-8''" + admin_painel.leads_filename()
+            return self.response(200, admin_painel.leads_csv(rows), "text/csv; charset=utf-8",
+                                 [("Content-Disposition", disposition)])
+        preset = query.get("p", [""])[0]
+        month = query.get("m", [""])[0]
+        period = admin_painel.resolve_period(preset, month)
+        start, end = period["from"], period["to"]
+        previous = start - (end - start)
+        args = {"p_from": admin_painel.iso(start), "p_to": admin_painel.iso(end), "p_include_test": include_test}
+        lead_params = [("select", "created_at,name,email,phone,page,utm_source,utm_campaign,city,region,device"),
+                       ("created_at", f"gte.{args['p_from']}"), ("created_at", f"lt.{args['p_to']}"),
+                       ("order", "created_at.desc"), ("limit", "200")]
+        if not include_test:
+            lead_params.append(("is_test", "eq.false"))
+
+        def optional(call):
+            try:
+                return call.result()
+            except TrackingUnavailable:
+                return None
+
+        with ThreadPoolExecutor(max_workers=5) as pool:
+            dash = pool.submit(supabase.rpc, "sc_admin_dashboard", args)
+            prev = pool.submit(supabase.rpc, "sc_admin_dashboard",
+                               {**args, "p_from": admin_painel.iso(previous), "p_to": args["p_from"]})
+            leads = pool.submit(supabase.call, "sc_leads", lead_params)
+            visitors = pool.submit(supabase.rpc, "sc_admin_visitors", args)
+            keywords = pool.submit(supabase.rpc, "sc_admin_keywords", args)
+            try:
+                dash_data = dash.result()
+            except TrackingUnavailable as error:
+                self.log_error("painel: %s", error)
+                missing = "404" in str(error) or "sc_" in str(error)
+                text = ("Falta criar as tabelas do painel. Abra o Supabase, vá em SQL Editor, New query, cole o arquivo "
+                        "<code>supabase_painel.sql</code> e clique em Run." if missing else "Tente novamente em instantes.")
+                return self.response(503, admin_painel.render_message("Erro ao carregar o painel", text), html, private)
+            markup = admin_painel.render_dashboard(
+                dash=dash_data, prev=optional(prev), leads=optional(leads) or [], visitors=optional(visitors),
+                keywords=optional(keywords), period=period, include_test=include_test, preset=preset, month=month)
+        self.response(200, markup, html, private)

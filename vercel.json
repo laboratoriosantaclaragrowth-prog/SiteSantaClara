@@ -9,7 +9,7 @@
       "destination": "/api/tracking?sc_action=ebook"
     },
     {
-      "source": "/api/:action(ebook-leads|ebook|events)",
+      "source": "/api/:action(ebook-leads|ebook|events|track)",
       "destination": "/api/tracking?sc_action=:action"
     },
     {
@@ -19,6 +19,14 @@
     {
       "source": "/admin/",
       "destination": "/api/tracking?sc_action=admin"
+    },
+    {
+      "source": "/admin/leads.csv",
+      "destination": "/api/tracking?sc_action=admin-leads"
+    },
+    {
+      "source": "/admin/:action(login|logout)",
+      "destination": "/api/tracking?sc_action=admin-:action"
     }
   ]
 }

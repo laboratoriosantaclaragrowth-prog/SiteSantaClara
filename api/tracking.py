@@ -10,6 +10,10 @@ PATHS = {
     "ebook": "/api/ebook",
     "events": "/api/events",
     "admin": "/admin",
+    "admin-leads": "/admin/leads.csv",
+    "admin-login": "/admin/login",
+    "admin-logout": "/admin/logout",
+    "track": "/api/track",
 }
 
 
@@ -29,7 +33,7 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.tracking_path()
-        if path not in {PATHS["ebook"], PATHS["admin"]}:
+        if path not in {PATHS["ebook"], PATHS["admin"], PATHS["admin-leads"]}:
             return self.response(404, {"error": "Página não encontrada."})
         try:
             self.handle_tracking_get()
@@ -39,7 +43,7 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = self.tracking_path()
-        if path not in {PATHS["ebook-leads"], PATHS["events"]}:
+        if path not in {PATHS["ebook-leads"], PATHS["events"], PATHS["track"], PATHS["admin-login"], PATHS["admin-logout"]}:
             return self.response(404, {"error": "Página não encontrada."})
         try:
             self.handle_tracking_post()
