@@ -21,7 +21,8 @@ class InformationalSiteTests(unittest.TestCase):
         self.assertEqual(len({doc.title.text for doc in self.documents}), 9)
         self.assertEqual(len({doc.select_one('meta[name="description"]')['content'] for doc in self.documents}), 9)
         for doc in self.documents:
-            self.assertEqual(len(doc.select('h1')), 1)
+            # O H1 dentro de <template> (banner institucional reserva) não aparece na página.
+            self.assertEqual(len([h for h in doc.select('h1') if not h.find_parent('template')]), 1)
 
     def test_no_commerce(self):
         for doc in self.documents:
@@ -72,7 +73,7 @@ class InformationalSiteTests(unittest.TestCase):
         home = self.documents[0]
         self.assertIsNotNone(home.select_one('.conversion-hero h1'))
         self.assertIsNone(home.select_one('#slide-track'))
-        self.assertEqual(len(home.select('#perguntas-frequentes details')), 5)
+        self.assertEqual(len(home.select('#perguntas-frequentes details')), 8)
         for doc in self.documents:
             self.assertIsNotNone(doc.select_one('.mobile-contact-bar a[href^="https://wa.me/5533987521448"]'))
             self.assertIsNotNone(doc.select_one('a[href^="tel:"]'))

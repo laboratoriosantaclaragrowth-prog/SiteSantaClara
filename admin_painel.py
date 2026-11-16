@@ -559,11 +559,12 @@ def leads_csv(rows):
         if col == "created_at" and value:
             value = fmt_date(value)
         text = str(value if value is not None else "")
-        if text[:1] in "=+-@":  # evita fórmula ao abrir no Excel
+        if text and text[0] in "=+-@":  # evita fórmula ao abrir no Excel
             text = "'" + text
         return '"' + text.replace('"', '""') + '"'
 
-    lines = [";".join(cols)] + [";".join(cell(c, r.get(c)) for c in cols) for r in rows]
+    titles = ["Data", "Nome", "E-mail", "WhatsApp", "Página", "Origem", "Meio", "Campanha", "Aparelho", "Cidade", "Estado"]
+    lines = [";".join(titles)] + [";".join(cell(c, r.get(c)) for c in cols) for r in rows]
     return "﻿" + "\n".join(lines)
 
 

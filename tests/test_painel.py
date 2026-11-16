@@ -117,6 +117,7 @@ class PainelTests(unittest.TestCase):
     def test_csv_blocks_spreadsheet_formulas(self):
         csv = admin_painel.leads_csv([{"name": "=HYPERLINK(1)", "email": "a@b.c"}])
         self.assertIn("\"'=HYPERLINK(1)\"", csv)
+        self.assertNotIn("\"'\"", csv)  # célula vazia continua vazia
 
 
 if __name__ == "__main__":
