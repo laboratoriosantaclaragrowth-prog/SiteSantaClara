@@ -264,7 +264,7 @@ def document(title, body):
     return (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<meta name="robots" content="noindex, nofollow"><title>{e(title)}</title>'
-            f'<link rel="icon" href="/logo.png"><style>{CSS}</style></head>'
+            f'<link rel="icon" href="/assets/favicon.png"><style>{CSS}</style></head>'
             f'<body><div class="adm">{body}</div></body></html>')
 
 

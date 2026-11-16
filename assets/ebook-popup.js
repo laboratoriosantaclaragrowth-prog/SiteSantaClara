@@ -63,7 +63,7 @@
               <p>Receba o guia gratuito do Santa Clara e escolha uma ação para colocar em prática hoje.</p>
             </div>
           </div>
-          <img class="ebook-popup-cover" src="/assets/images/ebook-santa-clara.png" alt="Capa do e-book Você cuida de tudo. Mas quem cuida de você?" width="1536" height="1024" decoding="async" fetchpriority="low">
+          <img class="ebook-popup-cover" src="/assets/images/ebook-santa-clara.webp" alt="Capa do e-book Você cuida de tudo. Mas quem cuida de você?" width="1536" height="1024" decoding="async" fetchpriority="low">
           <div class="ebook-popup-actions">
             <button type="button" class="site-button primary ebook-popup-cta" data-open-ebook-form>RECEBER MEU E-BOOK GRÁTIS</button>
           </div>
