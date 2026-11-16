@@ -64,7 +64,7 @@ header .navbar-toggler{min-height:44px;min-width:44px}
 #services .list-cards:focus .verso{display:flex;align-items:center}
 #services .list-cards:focus .verso p{color:#fff;font-size:14px;line-height:1.4;margin:0}
 #services .list-cards svg [fill]:not([fill="none"]){fill:var(--vermelho-pardini)}
-#region{background-image:linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.92) 18%, rgba(255,255,255,0.4) 38%, rgba(255,255,255,0) 60%), url('../images/region-background-mg2.png')}
+#region{background-image:linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.92) 18%, rgba(255,255,255,0.4) 38%, rgba(255,255,255,0) 60%), url('../images/region-background-mg2.webp')}
 #region .unidades{height:auto;min-height:220px}
 #region .content{width:auto;margin-top:24px}
 #region .content p{margin-bottom:6px;line-height:1.5}
