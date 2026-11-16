@@ -7,7 +7,7 @@ window.SANTA_CLARA = Object.freeze({
   "whatsapp": "5533987521448",
   "phone": "+5533987521448",
   "mapsUrl": "https://www.google.com/maps/dir/?api=1&destination=Rua+Amazonas%2C+15%2C+Nova+Terra%2C+Ara%C3%A7ua%C3%AD%2C+MG%2C+39604-028",
-  "mapEmbedUrl": "",
+  "mapEmbedUrl": "https://maps.google.com/maps?q=Rua+Amazonas%2C+15+-+Nova+Terra%2C+Ara%C3%A7ua%C3%AD+-+MG%2C+39604-028&z=16&output=embed",
   "resultsUrl": "",
   "ebookUrl": "/assets/ebook-santa-clara.pdf",
   "instagramUrl": "https://www.instagram.com/laboratoriosantaclara/",

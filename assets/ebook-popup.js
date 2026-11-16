@@ -129,6 +129,7 @@
             throw new Error('O cadastro está indisponível nesta página. Tente novamente em instantes.');
           }
           if (!response.ok) throw new Error(result.error);
+          track('ebook_lead_saved');
           reason = 'cta';
           dialog.close();
           location.assign(result.download);

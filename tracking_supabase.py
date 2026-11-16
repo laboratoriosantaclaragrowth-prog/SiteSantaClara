@@ -42,6 +42,29 @@ class SupabaseTracking:
         except (URLError, TimeoutError, ValueError, KeyError, AttributeError):
             raise TrackingUnavailable("Supabase response unavailable") from None
 
+    def call(self, path, params=None, body=None):
+        """Chama outra rota do banco (funções do painel e a visão de leads)."""
+        query = f"?{urlencode(params)}" if params else ""
+        payload = json.dumps(body).encode("utf-8") if body is not None else None
+        req = Request(f"{self.origin}/rest/v1/{path}{query}", payload, self.headers,
+                      method="POST" if payload is not None else "GET")
+        try:
+            with urlopen(req, timeout=12) as response:
+                raw = response.read()
+                return json.loads(raw) if raw else None
+        except HTTPError as error:
+            detail = ""
+            try:
+                detail = json.loads(error.read()).get("message", "")
+            except (ValueError, AttributeError):
+                pass
+            raise TrackingUnavailable(f"Supabase HTTP {error.code} {detail}".strip()) from None
+        except (URLError, TimeoutError, ValueError):
+            raise TrackingUnavailable("Supabase response unavailable") from None
+
+    def rpc(self, name, args):
+        return self.call(f"rpc/{name}", body=args)
+
     def exists(self, key, kind, session=None):
         params = {"select": "id", "id": f"eq.{key}", "kind": f"eq.{kind}", "limit": 1}
         if session:
@@ -71,6 +94,17 @@ class SupabaseTracking:
         except (URLError, TimeoutError, ValueError, TypeError, KeyError, AttributeError):
             raise TrackingUnavailable("E-book storage unavailable") from None
         return f"{storage}{path}?{urlencode({'token': tokens[0]})}"
+
+    def ebook_pdf(self):
+        limit = 4_500_000
+        try:
+            with urlopen(self.ebook_download_url(), timeout=8) as response:
+                pdf = response.read(limit + 1)
+        except (URLError, TimeoutError):
+            raise TrackingUnavailable("E-book download unavailable") from None
+        if len(pdf) > limit or not pdf.startswith(b"%PDF-"):
+            raise TrackingUnavailable("Invalid e-book PDF or Vercel response limit exceeded")
+        return pdf
 
     def dashboard(self, kind, page, kinds, since=""):
         params = {"select": "created,kind,session,data", "order": "created.desc,id.desc",

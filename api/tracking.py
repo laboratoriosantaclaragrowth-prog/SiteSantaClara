@@ -10,6 +10,10 @@ PATHS = {
     "ebook": "/api/ebook",
     "events": "/api/events",
     "admin": "/admin",
+    "admin-leads": "/admin/leads.csv",
+    "admin-login": "/admin/login",
+    "admin-logout": "/admin/logout",
+    "track": "/api/track",
 }
 
 
@@ -19,6 +23,8 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
     def tracking_path(self):
         url = urlsplit(self.path)
         path = url.path.rstrip("/")
+        if path == "/ebook":
+            path = PATHS["ebook"]
         if path == "/api/tracking":
             actions = parse_qs(url.query).get("sc_action", [])
             path = PATHS.get(actions[0], "") if len(actions) == 1 else ""
@@ -27,7 +33,7 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.tracking_path()
-        if path not in {PATHS["ebook"], PATHS["admin"]}:
+        if path not in {PATHS["ebook"], PATHS["admin"], PATHS["admin-leads"]}:
             return self.response(404, {"error": "Página não encontrada."})
         try:
             self.handle_tracking_get()
@@ -37,7 +43,7 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = self.tracking_path()
-        if path not in {PATHS["ebook-leads"], PATHS["events"]}:
+        if path not in {PATHS["ebook-leads"], PATHS["events"], PATHS["track"], PATHS["admin-login"], PATHS["admin-logout"]}:
             return self.response(404, {"error": "Página não encontrada."})
         try:
             self.handle_tracking_post()
@@ -46,11 +52,12 @@ class handler(LeadTracking, BaseHTTPRequestHandler):
             self.response(503, {"error": "Não foi possível concluir agora. Tente novamente."})
 
     def ebook_registration_url(self, key, supabase):
-        return supabase.ebook_download_url()
+        supabase.ebook_download_url()
+        return f"/ebook?id={key}"
 
     def respond_ebook(self, supabase):
-        self.response(302, "", "text/plain; charset=utf-8",
-                      [("Location", supabase.ebook_download_url())])
+        self.response(200, supabase.ebook_pdf(), "application/pdf",
+                      [("Content-Disposition", 'inline; filename="ebook-santa-clara.pdf"')])
 
     def end_headers(self):
         self.send_header("X-Robots-Tag", "noindex, nofollow")
