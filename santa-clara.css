@@ -1180,9 +1180,11 @@ dialog::backdrop{background:#07399b66}
 .sc-gallery h2{margin:0 0 10px}
 .sc-gallery-intro{max-width:440px;margin:0 0 28px;color:#44566f;font-size:17px;line-height:1.55}
 .sc-slider-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.sc-slider-arrow{display:grid;place-items:center;width:44px;height:44px;border:1px solid #c9d8ea;border-radius:50%;background:#fff;color:#07399b;cursor:pointer;transition:background .2s,color .2s}
+.sc-slider-arrow{position:absolute;top:50%;z-index:2;display:grid;place-items:center;width:44px;height:44px;margin-top:-22px;border:0;border-radius:50%;background:#ffffffe6;color:#07399b;cursor:pointer;box-shadow:0 4px 14px #10243d33;transition:background .2s,color .2s}
+.sc-slider-prev{left:12px}
+.sc-slider-next{right:12px}
 .sc-slider-arrow:hover,.sc-slider-arrow:focus-visible{background:#07399b;color:#fff}
-.sc-slider-dots{display:flex;gap:6px;margin-left:8px}
+.sc-slider-dots{display:flex;gap:6px}
 .sc-slider-dot{width:9px;height:9px;padding:0;border:0;border-radius:999px;background:#b9c9dc;cursor:pointer;transition:width .25s,background .25s}
 .sc-slider-dot[aria-current="true"]{width:26px;background:#07399b}
 .sc-slider{position:relative;overflow:hidden;border-radius:22px;box-shadow:0 18px 48px #18345324;background:#dfe8f2;aspect-ratio:3/2}
