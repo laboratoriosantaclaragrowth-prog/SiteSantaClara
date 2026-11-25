@@ -335,16 +335,16 @@ dialog::backdrop{background:#07399b66}
 }
 .institution-banner-media{position:absolute;inset:0;z-index:-1;margin:0}
 .institution-banner-media img{display:block;width:100%;height:100%;object-fit:cover;object-position:70% center}
-/* Faixa com a foto da fachada: metade branca com o texto, degradê e a foto à direita */
+/* Faixa com a foto da equipe: metade branca com o texto, degradê e a foto à direita */
 .institution-banner.has-fachada{background:#fff}
 .has-fachada .institution-banner-media{left:auto;right:0;width:56%}
 .has-fachada .institution-banner-media::before{content:"";position:absolute;inset:0 auto 0 0;width:40%;background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.85) 30%,rgba(255,255,255,0) 100%);z-index:1;pointer-events:none}
-.has-fachada .institution-banner-media img{object-position:center 40%}
+.has-fachada .institution-banner-media img{object-position:center 35%}
 @media(max-width:767px){
   .institution-banner.has-fachada{flex-direction:column;align-items:stretch;min-height:0;padding:0 0 32px}
   .has-fachada .institution-banner-media{position:relative;inset:auto;width:100%;height:240px;z-index:0}
   .has-fachada .institution-banner-media::before{inset:auto 0 0 0;width:auto;height:45%;background:linear-gradient(0deg,#fff 0%,rgba(255,255,255,0) 100%)}
-  .has-fachada .institution-banner-media img{object-position:center 35%}
+  .has-fachada .institution-banner-media img{object-position:30% 40%}
   .has-fachada .institution-panel{margin-top:-48px;position:relative}
 }
 .institution-banner-media figcaption{position:absolute;right:16px;bottom:10px;padding:3px 8px;border-radius:4px;background:#10243dcc;color:#fff;font-size:12px}
