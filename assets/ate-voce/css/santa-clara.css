@@ -121,3 +121,7 @@ dialog p{font-size:16px;line-height:1.6}
  #facilidades h3{padding-inline:16px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* Fotos reais da coleta no lugar das ilustrações */
+.sc-real-photo{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:24px;box-shadow:0 16px 40px #18345326}
+.sc-real-photo-portrait{aspect-ratio:4/5;max-height:560px;object-position:center 20%;margin-inline:auto}
