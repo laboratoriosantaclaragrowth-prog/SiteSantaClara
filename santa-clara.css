@@ -335,6 +335,18 @@ dialog::backdrop{background:#07399b66}
 }
 .institution-banner-media{position:absolute;inset:0;z-index:-1;margin:0}
 .institution-banner-media img{display:block;width:100%;height:100%;object-fit:cover;object-position:70% center}
+/* Faixa com a foto da equipe: metade branca com o texto, degradê e a foto à direita */
+.institution-banner.has-fachada{background:#fff}
+.has-fachada .institution-banner-media{left:auto;right:0;width:56%}
+.has-fachada .institution-banner-media::before{content:"";position:absolute;inset:0 auto 0 0;width:40%;background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.85) 30%,rgba(255,255,255,0) 100%);z-index:1;pointer-events:none}
+.has-fachada .institution-banner-media img{object-position:center 35%}
+@media(max-width:767px){
+  .institution-banner.has-fachada{flex-direction:column;align-items:stretch;min-height:0;padding:0 0 32px}
+  .has-fachada .institution-banner-media{position:relative;inset:auto;width:100%;height:240px;z-index:0}
+  .has-fachada .institution-banner-media::before{inset:auto 0 0 0;width:auto;height:45%;background:linear-gradient(0deg,#fff 0%,rgba(255,255,255,0) 100%)}
+  .has-fachada .institution-banner-media img{object-position:30% 40%}
+  .has-fachada .institution-panel{margin-top:-48px;position:relative}
+}
 .institution-banner-media figcaption{position:absolute;right:16px;bottom:10px;padding:3px 8px;border-radius:4px;background:#10243dcc;color:#fff;font-size:12px}
 .institution-panel{max-width:455px;padding:36px;background:#07399bd1;color:#fff;border-radius:0 66px 0 66px}
 .institution-panel p{max-width:360px;margin:0;font-size:17px;line-height:1.5}
@@ -355,6 +367,7 @@ dialog::backdrop{background:#07399b66}
 .sc-about-tagline{font-size:16px!important;font-weight:700;font-style:italic;color:#07399b!important;border-left:4px solid #0057c8;padding-left:16px;line-height:26px!important}
 .sc-about-image figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
 .sc-team-img{width:100%;max-width:460px;aspect-ratio:1;object-fit:cover;border-radius:20px;box-shadow:0 16px 48px #18345324}
+.sc-team-img.sc-team-img-wide{max-width:560px;aspect-ratio:3/2;object-position:center 30%}
 .sc-about-image figcaption{text-align:center;font-size:14px;color:#485569;line-height:22px}
 .sc-about-image figcaption strong{color:#183453}
 /* Service cards section */
@@ -1158,3 +1171,45 @@ dialog::backdrop{background:#07399b66}
     bottom: 12px;
   }
 }
+
+/* Fotos reais: banner de check-up, fachada em "Como chegar" e galeria */
+.sc-promo-banner-img.sc-promo-banner-photo{object-position:62% 30%}
+.location-photo-fachada{height:220px;margin-bottom:16px;object-position:center 40%}
+.sc-gallery{width:100%;padding:72px 0;background:#f5f8fc}
+.sc-gallery-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:48px;align-items:center}
+.sc-gallery h2{margin:0 0 10px}
+.sc-gallery-intro{max-width:440px;margin:0 0 28px;color:#44566f;font-size:17px;line-height:1.55}
+.sc-slider-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sc-slider-arrow{position:absolute;top:50%;z-index:2;display:grid;place-items:center;width:44px;height:44px;margin-top:-22px;border:0;border-radius:50%;background:#ffffffe6;color:#07399b;cursor:pointer;box-shadow:0 4px 14px #10243d33;transition:background .2s,color .2s}
+.sc-slider-prev{left:12px}
+.sc-slider-next{right:12px}
+.sc-slider-arrow:hover,.sc-slider-arrow:focus-visible{background:#07399b;color:#fff}
+.sc-slider-dots{display:flex;gap:6px}
+.sc-slider-dot{width:9px;height:9px;padding:0;border:0;border-radius:999px;background:#b9c9dc;cursor:pointer;transition:width .25s,background .25s}
+.sc-slider-dot[aria-current="true"]{width:26px;background:#07399b}
+.sc-slider{position:relative;overflow:hidden;border-radius:22px;box-shadow:0 18px 48px #18345324;background:#dfe8f2;aspect-ratio:3/2}
+.sc-slider-track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior-x:contain}
+.sc-slider-track::-webkit-scrollbar{display:none}
+.sc-slider-track:focus-visible{outline:3px solid #0057c8;outline-offset:-3px}
+.sc-slide{flex:0 0 100%;margin:0;scroll-snap-align:start;scroll-snap-stop:always}
+.sc-slide img{display:block;width:100%;height:100%;object-fit:cover}
+@media(max-width:767px){
+  .sc-gallery{padding:48px 0}
+  .sc-gallery-layout{grid-template-columns:1fr;gap:20px}
+  .sc-gallery-intro{margin-bottom:0}
+  .sc-slider{order:2;border-radius:16px}
+  .sc-gallery-text{display:contents}
+  .sc-slider-controls{order:3;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){.sc-slider-track{scroll-behavior:auto}}
+
+/* Foto real no topo das páginas de exame */
+.exam-heading.has-photo .info-container{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:48px;align-items:center}
+.exam-heading-photo{margin:0;overflow:hidden;border-radius:20px;box-shadow:0 16px 40px #18345322;aspect-ratio:3/2;background:#dfe8f2}
+.exam-heading-photo img{display:block;width:100%;height:100%;object-fit:cover}
+@media(max-width:767px){
+  .exam-heading.has-photo .info-container{grid-template-columns:1fr;gap:24px}
+  .exam-heading-photo{border-radius:16px}
+}
+.contact-photo{height:240px;margin-top:24px;object-position:center 35%}
+.contact-page-layout .location-photo-fachada{margin-bottom:16px}

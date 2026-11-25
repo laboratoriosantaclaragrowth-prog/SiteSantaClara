@@ -283,16 +283,30 @@ class LeadTracking:
             return self.headers.get("Sec-Fetch-Site") == "same-origin"
         return not origin or origin in (f"http://{host}", f"https://{host}")
 
+    def read_body(self, limit):
+        """Lê o corpo inteiro antes de responder (responder sem ler derruba a conexão no Windows).
+        Retorna None se faltar o tamanho ou passar do limite."""
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+        except ValueError:
+            return None
+        if length <= 0:
+            return b""
+        if length > limit:
+            self.close_connection = True
+            return None
+        return self.rfile.read(length)
+
     def handle_track_post(self):
+        raw = self.read_body(64000)
         if not self.same_origin():
             return self.send_empty(403)
         if BOT.search(self.headers.get("User-Agent") or "bot"):
             return self.send_empty()
         try:
-            length = int(self.headers.get("Content-Length", 0))
-            if not 0 < length <= 64000:
+            if not raw:
                 raise ValueError
-            item = json.loads(self.rfile.read(length))
+            item = json.loads(raw)
             if not isinstance(item, dict):
                 raise ValueError
         except (ValueError, TypeError):
@@ -316,15 +330,15 @@ class LeadTracking:
         self.send_empty()
 
     def handle_admin_post(self, path):
+        raw = self.read_body(2048)
         if not self.same_origin():
             return self.send_empty(403)
         if path == "/admin/logout":
             return self.send_empty(303, [("Location", "/admin"),
                                          ("Set-Cookie", admin_painel.session_cookie(self.headers.get("Host")))])
         try:
-            length = int(self.headers.get("Content-Length", 0))
-            form = parse_qs(self.rfile.read(length).decode("utf-8")) if 0 < length <= 2048 else {}
-        except (ValueError, UnicodeDecodeError):
+            form = parse_qs(raw.decode("utf-8")) if raw else {}
+        except UnicodeDecodeError:
             form = {}
         time.sleep(0.4)  # dificulta tentativa e erro
         if not admin_painel.check_password(form.get("password", [""])[0]):

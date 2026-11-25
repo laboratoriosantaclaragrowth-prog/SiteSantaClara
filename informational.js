@@ -188,4 +188,66 @@
       delete link.dataset.action;
     }
   }
+
+  // Galeria "Conheça o laboratório": uma foto grande que passa em slide.
+  // Arrastar (celular), setas, bolinhas e teclado; troca sozinha a cada 5s,
+  // pausando com o mouse em cima, com o foco, com a aba escondida ou com "menos animação".
+  const slider = $('.sc-slider-track');
+  if (slider) {
+    const slides = [...slider.children];
+    const dots = $$('.sc-slider-dot');
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = 0;
+    let timer;
+    let paused = false;
+
+    const show = index => {
+      current = index;
+      dots.forEach((dot, i) => (i === current ? dot.setAttribute('aria-current', 'true') : dot.removeAttribute('aria-current')));
+      // Adianta a foto atual e a próxima para o slide não ficar em branco
+      for (const i of [current, (current + 1) % slides.length]) {
+        const img = slides[i].querySelector('img');
+        if (img) img.loading = 'eager';
+      }
+    };
+    let moving = 0;
+    const goTo = index => {
+      show((index + slides.length) % slides.length);
+      moving = Date.now();
+      slider.scrollTo({ left: slides[current].offsetLeft, behavior: calm.matches ? 'auto' : 'smooth' });
+    };
+    // Quando a pessoa arrasta, descobre em qual foto parou
+    const mark = () => {
+      if (Date.now() - moving < 700) return;
+      const index = Math.round(slider.scrollLeft / Math.max(slider.clientWidth, 1));
+      show(Math.min(Math.max(index, 0), slides.length - 1));
+    };
+    const stop = () => { clearInterval(timer); timer = undefined; };
+    const start = () => {
+      stop();
+      if (!paused && !calm.matches && document.visibilityState === 'visible') timer = setInterval(() => goTo(current + 1), 5000);
+    };
+
+    let scrollEnd;
+    slider.addEventListener('scroll', () => { clearTimeout(scrollEnd); scrollEnd = setTimeout(mark, 80); }, { passive: true });
+    $$('.sc-slider-arrow').forEach(button => button.addEventListener('click', () => { goTo(current + Number(button.dataset.slide)); start(); }));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); start(); }));
+    slider.addEventListener('keydown', event => {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        goTo(current + (event.key === 'ArrowRight' ? 1 : -1));
+      }
+    });
+    const gallery = slider.closest('.sc-gallery');
+    for (const [type, value] of [['mouseenter', true], ['mouseleave', false], ['focusin', true], ['focusout', false], ['touchstart', true]]) {
+      gallery.addEventListener(type, () => { paused = value; start(); }, { passive: true });
+    }
+    document.addEventListener('visibilitychange', start);
+    calm.addEventListener?.('change', start);
+    // Só começa a passar quando a galeria aparece na tela
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) start(); else stop();
+    }, { threshold: 0.3 }).observe(gallery);
+    mark();
+  }
 })();
