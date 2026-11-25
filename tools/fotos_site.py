@@ -29,9 +29,6 @@ PHOTOS = [
     ("IMG_9945.jpg", "coleta-braco", 1200),
 ]
 
-# Fotos pequenas da galeria (a primeira da galeria usa a versão grande)
-THUMBS = ["microscopio-analise", "analisador-hematologico", "analisador-bioquimico", "coleta-braco",
-          "microscopio-lamina", "laudos-computador", "analisador-tecnica", "microscopio-urina"]
 
 
 def main():
@@ -46,12 +43,6 @@ def main():
         image.save(out, "WEBP", quality=78, method=6)
         total += out.stat().st_size
         print(f"{slug}.webp {image.size[0]}x{image.size[1]} {out.stat().st_size // 1024} KB")
-    # Miniaturas da galeria da home (640 px)
-    for slug in THUMBS:
-        image = Image.open(DST / f"{slug}.webp")
-        image.thumbnail((640, 640), Image.LANCZOS)
-        image.save(DST / f"{slug}-p.webp", "WEBP", quality=76, method=6)
-        total += (DST / f"{slug}-p.webp").stat().st_size
     # Imagem de compartilhamento (WhatsApp, Facebook): 1200x630 em JPG
     share = ImageOps.fit(ImageOps.exif_transpose(Image.open(SRC / "FACHADA.jpg")).convert("RGB"), (1200, 630),
                          Image.LANCZOS, centering=(0.5, 0.4))
